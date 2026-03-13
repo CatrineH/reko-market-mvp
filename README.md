@@ -113,5 +113,3 @@ Kanban board in MS Planner connected to Teams channel
 - Payment solution
 - Full test coverage
 - Publish to App Store / Google Play
-
-..
