@@ -1,0 +1,54 @@
+# OS and editor files
+.DS_Store
+.vs/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.sln.docstates
+*.suo
+*.sw?
+*.user
+*.userosscache
+*.rsuser
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# .NET build outputs
+**/bin/
+**/obj/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/TestResults/
+*.coverage
+*.coveragexml
+coverage/
+coverage*.json
+coverage*.xml
+coverage*.info
+BenchmarkDotNet.Artifacts/
+
+# Frontend build outputs
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/.vite/
+**/.eslintcache
+
+# Local environment files
+.env.local
+.env.*.local
+*.local
+
+# Package artifacts
+*.nupkg
+*.snupkg
+
+# Generated binary logs
+*.binlog
