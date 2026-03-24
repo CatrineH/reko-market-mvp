@@ -4,11 +4,18 @@ function Login() {
     const [username, setUsername] = useState ("");
     const [password, setPassword] = useState (""); 
 
-  return (
-    <>
-    <h1>Hello Login</h1>
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 
-    <form>
+      e.preventDefault();
+
+      console.log("Submit triggered");
+      console.log(`Velkommen, ${username}`);
+    }
+
+  return (
+
+  <>
+   <form onSubmit={handleSubmit}>
         <div>
             <label>Username</label>
             <input 
@@ -21,7 +28,7 @@ function Login() {
     <div>
         <label>Password</label>
           <input
-            type="text"
+            type="password"
             value={password}
             onChange={(e) => setPassword (e.target.value)}
          />
@@ -29,8 +36,8 @@ function Login() {
 
     <button type="submit">Logg inn</button>
 
-    </form>
-    </>
+   </form>
+  </>
   )
 }
 
