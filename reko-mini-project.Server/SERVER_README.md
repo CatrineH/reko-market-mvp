@@ -32,3 +32,14 @@ Select the endpoint you want to test from the list, locate the "Test Request" bu
 ## CORS Configuration
 The server is configured to allow cross-origin requests from the frontend application. The allowed origins are specified in launchSettings.json under the `ALLOWED_ORIGINS` environment variable.
 Ensure that the frontend application is running on the allowed origin specified in the server configuration to avoid CORS issues.
+
+## Database Configuration
+The server uses Entity Framework Core with SQLite for data storage.
+*(Will be replaced with a more robust database solution in the future - possibly Azure SQL database.)*
+ The connection string is defined in the appsettings.Development.json file under the `ConnectionStrings` section. The default connection string points to a local SQLite database file located at `Data/inventorydata.db`.
+
+Run the following command to create the database file. The file will be created in the Data folder, as "inventorydata.db":
+```
+dotnet ef database update
+```
+Now you should be able to run the server and it will use the SQLite database for data storage. Manipulate the database using Scalar endpoints to add, update, or delete data. The data is purely local at this stage, so it will not persist across different machines or deployments.
