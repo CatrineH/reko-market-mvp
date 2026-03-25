@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using reko_mini_project.Server.Data;
+using reko_mini_project.Server.Features.ImageProcessing.Services;
+using reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 namespace reko_mini_project.Server.Configurations;
 
@@ -16,6 +18,9 @@ public static class ServiceCollectionExtensions
         services.AddOpenApi();
         services.AddCorsConfiguration(configuration);
         services.AddDatabaseConfiguration(configuration);
+        services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
+        services.AddScoped<IImageValidator, ImageValidator>();
+        services.AddScoped<ImageUploadService>();
 
         return services;
     }
