@@ -12,7 +12,7 @@ function Login() {
       console.log("Submit triggered");
       console.log(`Velkommen, ${username}`);
 
-      navigate("/profile");
+      navigate("/profile", { state: { username } });
 
     }
 
