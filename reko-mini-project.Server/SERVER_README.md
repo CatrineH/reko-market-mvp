@@ -58,12 +58,12 @@ Current behavior:
    2. otherwise `BlobStorage:ServiceUri` -> `BlobServiceClient(serviceUri, DefaultAzureCredential)`
 - `BlobStorage:ContainerName` is required in all environments.
 
-Development:
+### Development:
 - Use Azurite with `BlobStorage:ConnectionString` in `appsettings.Development.json`.
 - Typical container name is `wtblob`.
 - Blob SDK API version is pinned in code for Azurite compatibility.
 
-Production (Azure Web App/container):
+### Production (Azure Web App/container):
 - Recommended auth is Managed Identity (no storage key/connection string in app code).
 - Required Azure resources/wiring:
    1. Azure Storage Account with Blob service
@@ -75,6 +75,10 @@ Production (Azure Web App/container):
    - `BlobStorage__ContainerName=<container-name>`
 - Important: do not set `BlobStorage__ConnectionString` in production if you want Managed Identity path.
 
-Debugging / Testing:
+### Debugging / Testing:
+- Use Azurite VSCode extension for local blob storage emulation.
+   - F1 -> "Azurite: Start" to start the blob service locally (must be done before uploading image).
+   - F1 -> "Azurite: Stop" to stop it when done.
+   - F1 -> "Azurite: Clean" to clean up.
 - Use Scalar endpoints to test blob upload functionality.
 - Use Azure Storage Explorer (desktop app) to view/manage uploaded blobs.
