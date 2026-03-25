@@ -1,4 +1,5 @@
 using reko_mini_project.Server.Features.Products;
+using reko_mini_project.Server.Features.ImageProcessing;
 using Scalar.AspNetCore;
 
 namespace reko_mini_project.Server.Configurations;
@@ -18,6 +19,7 @@ public static class WebApplicationExtensions
         }
 
         app.MapProductEndpoints();
+        app.MapImageProcessingEndpoints();
 
         return app;
     }
