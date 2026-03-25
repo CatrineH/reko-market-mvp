@@ -12,6 +12,12 @@ The backend server is built using ASP.NET Core Minimal API. It provides endpoint
    Now listening on: https://localhost:7213
    ```
 
+## Running Tests
+To run the unit tests for the server, open Testing tools in VSCode or use the following command in the terminal:
+```
+dotnet test
+```
+
 ## API Endpoints
 - `GET /products`: Currently prints "Hello Reko" (will be updated with appropriate data management soon).
 - *TODO: Add more endpoints as needed (e.g., POST /products, GET /products/{id}, etc.)*
@@ -43,3 +49,32 @@ Run the following command to create the database file. The file will be created 
 dotnet ef database update
 ```
 Now you should be able to run the server and it will use the SQLite database for data storage. Manipulate the database using Scalar endpoints to add, update, or delete data. The data is purely local at this stage, so it will not persist across different machines or deployments.
+
+## Image upload Blob storage management
+Current behavior:
+- Image uploads are stored in Azure Blob Storage only (not on local disk).
+- Auth mode is selected in code by config priority:
+   1. `BlobStorage:ConnectionString` -> `BlobServiceClient(connectionString)`
+   2. otherwise `BlobStorage:ServiceUri` -> `BlobServiceClient(serviceUri, DefaultAzureCredential)`
+- `BlobStorage:ContainerName` is required in all environments.
+
+Development:
+- Use Azurite with `BlobStorage:ConnectionString` in `appsettings.Development.json`.
+- Typical container name is `wtblob`.
+- Blob SDK API version is pinned in code for Azurite compatibility.
+
+Production (Azure Web App/container):
+- Recommended auth is Managed Identity (no storage key/connection string in app code).
+- Required Azure resources/wiring:
+   1. Azure Storage Account with Blob service
+   2. Blob container (or allow app to create it)
+   3. System- or user-assigned Managed Identity on the Web App
+   4. RBAC assignment: `Storage Blob Data Contributor` for that identity on the storage account or container scope
+- Required app configuration values:
+   - `BlobStorage__ServiceUri=https://<storage-account>.blob.core.windows.net`
+   - `BlobStorage__ContainerName=<container-name>`
+- Important: do not set `BlobStorage__ConnectionString` in production if you want Managed Identity path.
+
+Debugging / Testing:
+- Use Scalar endpoints to test blob upload functionality.
+- Use Azure Storage Explorer (desktop app) to view/manage uploaded blobs.
