@@ -52,3 +52,6 @@ BenchmarkDotNet.Artifacts/
 
 # Generated binary logs
 *.binlog
+
+# Database files
+*.db*

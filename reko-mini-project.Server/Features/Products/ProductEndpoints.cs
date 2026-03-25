@@ -1,4 +1,7 @@
+using reko_mini_project.Server.Features.Products.Create;
 using reko_mini_project.Server.Features.Products.Read;
+using reko_mini_project.Server.Features.Products.Update;
+using reko_mini_project.Server.Features.Products.Delete;
 
 namespace reko_mini_project.Server.Features.Products;
 
@@ -12,7 +15,11 @@ public static class ProductEndpoints
         var group = app.MapGroup(_baseRoute)
             .WithTags(_groupTag1);
 
-        group.MapGetAllProducts();
+        group.MapGetProducts();
+        group.MapGetProductById();
+        group.MapCreateProduct();
+        group.MapUpdateProduct();
+        group.MapDeleteProduct();
 
         return app;
     }
