@@ -1,8 +1,8 @@
-using reko_mini_project.Server.Data;
+using reko_mini_project.Server.Features.Products;
 
 namespace reko_mini_project.Server.Features.Products.Create;
 
-public static class CreateInventoryItemEndpoint
+public static class CreateProductEndpoint
 {
     private const string _baseRoute = "/api/products";
     private const string _routeName = "CreateProduct";
@@ -10,20 +10,16 @@ public static class CreateInventoryItemEndpoint
 
     public static RouteHandlerBuilder MapCreateProduct(this RouteGroupBuilder group)
     {
-        return group.MapPost("/", async (CreateProductRequest request, AppDbContext dbContext, CancellationToken cancellationToken) =>
+        return group.MapPost("/", async (CreateProductRequest request, IProductService productService, CancellationToken cancellationToken) =>
         {
-            var product = new Product
+            var result = await productService.CreateAsync(request, null, cancellationToken);
+
+            return result switch
             {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Weight = request.Weight,
-                Price = request.Price
+                ProductServiceResult.Success s => Results.Created($"{_baseRoute}/{s.Product.Id}", s.Product),
+                ProductServiceResult.ValidationError e => Results.ValidationProblem(e.Errors),
+                _ => Results.StatusCode(500)
             };
-
-            dbContext.Products.Add(product);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return Results.Created($"{_baseRoute}/{product.Id}", product);
         })
         .WithName(_routeName)
         .WithSummary(_routeSummary);
