@@ -8,9 +8,9 @@ function UserProfile() {
 
   // Temporary product list (mock data)
   const products = [
-    { id: 1, name: "Milk", price: "20 NOK" },
-    { id: 2, name: "Eggs", price: "35 NOK" },
-    { id: 3, name: "Potatoes", price: "15 NOK" },
+    { id: 1, name: "Melk", price: "20 NOK" },
+    { id: 2, name: "Egg", price: "35 NOK" },
+    { id: 3, name: "Poteter", price: "15 NOK" },
   ];
 
   return (
@@ -22,7 +22,7 @@ function UserProfile() {
 
         <div className="profile-info">
           <h2 className="profile-username">{username}</h2>
-          <p className="profile-detail">Farm: Green Valley</p>
+          <p className="profile-detail">Farm: Biri gård</p>
           <p className="profile-detail">Location: Norway</p>
         </div>
       </div>
