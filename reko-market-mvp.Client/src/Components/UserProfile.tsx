@@ -6,7 +6,7 @@ function UserProfile() {
 
   const username = location.state?.username || "Guest";
 
-  // Temporary product list (mock data)
+  // Temporary product list
   const products = [
     { id: 1, name: "Melk", price: "20 NOK" },
     { id: 2, name: "Egg", price: "35 NOK" },
@@ -30,13 +30,13 @@ function UserProfile() {
       {/* Add Product Button */}
       <div className="add-product-section">
         <button onClick={() => navigate("/add-product")}>
-          Add Product
+          Legg til produkt
         </button>
       </div>
 
       {/* Product List */}
       <div className="product-list">
-        <h3>My Products</h3>
+        <h3>Mine produkter</h3>
 
         <ul>
           {products.map((product) => (
