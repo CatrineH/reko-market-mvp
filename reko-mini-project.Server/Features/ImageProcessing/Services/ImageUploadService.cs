@@ -27,6 +27,19 @@ public class ImageUploadService
         return blobClient.Uri.ToString();
     }
 
+    public async Task DeleteImageAsync(string blobUrl, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(blobUrl))
+        {
+            return;
+        }
+
+        var containerClient = await GetContainerClientAsync(cancellationToken);
+        var blobName = new Uri(blobUrl).Segments.Last();
+        var blobClient = containerClient.GetBlobClient(blobName);
+        await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+    }
+
     private IFormFile GetValidatedFile(SaveImageDataRequest request)
     {
         var file = request.FormFile;
