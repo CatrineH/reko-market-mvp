@@ -11,7 +11,7 @@ using reko_mini_project.Server.Data;
 namespace reko_mini_project.Server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260324111131_InitialCreate")]
+    [Migration("20260326070618_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,10 @@ namespace reko_mini_project.Server.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")

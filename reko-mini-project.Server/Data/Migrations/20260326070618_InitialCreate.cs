@@ -17,6 +17,7 @@ namespace reko_mini_project.Server.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
+                    ImageUrl = table.Column<string>(type: "TEXT", nullable: false),
                     Weight = table.Column<double>(type: "REAL", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
