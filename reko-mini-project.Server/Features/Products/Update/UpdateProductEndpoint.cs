@@ -1,4 +1,4 @@
-using reko_mini_project.Server.Data;
+using reko_mini_project.Server.Features.Products;
 
 namespace reko_mini_project.Server.Features.Products.Update;
 
@@ -9,21 +9,17 @@ public static class UpdateProductEndpoint
 
     public static RouteHandlerBuilder MapUpdateProduct(this RouteGroupBuilder group)
     {
-        return group.MapPut("/{id:guid}", async (Guid id, UpdateProductRequest request, AppDbContext dbContext, CancellationToken cancellationToken) =>
+        return group.MapPut("/{id:guid}", async (Guid id, UpdateProductRequest request, IProductService productService, CancellationToken cancellationToken) =>
         {
-            var product = await dbContext.Products.FindAsync([id], cancellationToken);
-            if (product is null)
+            var result = await productService.UpdateAsync(id, request, null, cancellationToken);
+
+            return result switch
             {
-                return Results.NotFound();
-            }
-
-            product.Name = request.Name;
-            product.Weight = request.Weight;
-            product.Price = request.Price;
-
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return Results.Ok(product);
+                ProductServiceResult.Success s => Results.Ok(s.Product),
+                ProductServiceResult.ValidationError e => Results.ValidationProblem(e.Errors),
+                ProductServiceResult.NotFound => Results.NotFound(),
+                _ => Results.StatusCode(500)
+            };
         })
         .WithName(_endpointName)
         .WithSummary(_summary);
