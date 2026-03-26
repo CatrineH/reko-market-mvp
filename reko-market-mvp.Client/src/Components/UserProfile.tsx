@@ -22,8 +22,8 @@ function UserProfile() {
 
         <div className="profile-info">
           <h2 className="profile-username">{username}</h2>
-          <p className="profile-detail">Farm: Biri gård</p>
-          <p className="profile-detail">Location: Norway</p>
+          <p className="profile-detail">Biri gård</p>
+          <p className="profile-detail">REKO-ringen Gjøvik</p>
         </div>
       </div>
 
