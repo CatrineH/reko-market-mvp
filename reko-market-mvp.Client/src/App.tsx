@@ -12,7 +12,8 @@ function App() {
         <h1>Hello Reko</h1>
 
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Login />} /> 
+          <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/add-product" element={<AddProduct />} />
         </Routes>
