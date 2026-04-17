@@ -1,3 +1,30 @@
 :root {
+  --global-border-radius: 12px;
+  --global-border: 1px solid #ccc;
+  --login-button-background: #0D7F08;
+  --login-button-textcolor: white;
+}
 
-  }
+input {
+  min-width: 15%;
+  max-width: 90%;
+  min-height: 30px;
+  /* padding: 10px 5px;        */
+  /* margin-top: 6px;          */
+  border: var(--global-border);
+  border-radius: var(--global-border-radius);
+  box-sizing: border-box;
+}
+
+label {
+  display: block; /* puts label on its own line */
+  margin-bottom: 2px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 5px;
+  width: 25%;
+  border: var(--global-border);
+  border-radius: var(--global-border-radius);
+}

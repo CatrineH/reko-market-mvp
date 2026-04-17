@@ -1,49 +1,47 @@
-import './Login.css';
+import "./Login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-    const [username, setUsername] = useState ("");
-    const [password, setPassword] = useState (""); 
-    const navigate = useNavigate();
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      e.preventDefault();
+    console.log("Submit triggered");
+    console.log(`Velkommen, ${username}`);
 
-      console.log("Submit triggered");
-      console.log(`Velkommen, ${username}`);
-
-      navigate("/profile", { state: { username } });
-
-    }
+    navigate("/profile", { state: { username } });
+  };
 
   return (
-
-  <>
-   <form onSubmit={handleSubmit}>
-        <div className = "usernameInput">
-            <label>Username</label>
-            <input 
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="usernameInput">
+          <label>Username</label>
+          <input
             type="text"
             value={username}
-            onChange={(e) => setUsername (e.target.value)}
-            />
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </div>
 
-    <div>
-        <label>Password</label>
+        <div className="passwordInput">
+          <label>Password</label>
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword (e.target.value)}
-         />
-    </div>
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-    <button type="submit">Logg inn</button>
-
-   </form>
-  </>
-  )
+        <button className="login-button" type="submit">
+          Logg inn
+        </button>
+      </form>
+    </>
+  );
 }
 
-export default Login
+export default Login;
