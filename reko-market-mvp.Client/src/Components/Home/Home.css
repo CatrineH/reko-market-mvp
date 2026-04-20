@@ -1,0 +1,16 @@
+.home-page-background {
+  min-height: 100vh;
+  background-color: #0D7F08;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-icon {
+  cursor: pointer;
+}
+
+.home-icon img {
+  width: 120px;
+  height: auto;
+}

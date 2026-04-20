@@ -17,10 +17,12 @@ function Login() {
 
   return (
     <>
+    
       <div className="login-form">
         <form onSubmit={handleSubmit}>
+          <h1>Logg inn</h1>
           <div className="usernameInput">
-            <label>Username</label>
+            <label>Navn eller e-post</label>
             <input
               type="text"
               value={username}
@@ -29,7 +31,7 @@ function Login() {
           </div>
 
           <div className="passwordInput">
-            <label>Password</label>
+            <label>Passord</label>
             <input
               type="password"
               value={password}
@@ -37,9 +39,18 @@ function Login() {
             />
           </div>
 
+          <a href="#" className="register-link">
+            Registrer deg
+          </a>
+
           <button className="login-button" type="submit">
             Logg inn
           </button>
+
+          <a href="#" className="forgot-password-link">
+            Glemt passord?
+          </a>
+
         </form>
       </div>
     </>

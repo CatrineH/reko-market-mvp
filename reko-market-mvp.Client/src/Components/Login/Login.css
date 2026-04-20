@@ -12,3 +12,8 @@ form div {
   display: flex;
   justify-content: center;
 }
+
+.register-link {
+  display: block;
+  margin-top: 10px;
+}
