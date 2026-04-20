@@ -7,3 +7,8 @@ form div {
   background-color: var(--login-button-background);
   color: var(--login-button-textcolor);
 } 
+
+.login-form {
+  display: flex;
+  justify-content: center;
+}
