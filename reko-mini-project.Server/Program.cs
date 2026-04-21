@@ -2,7 +2,7 @@ using reko_mini_project.Server.Configurations;
 using reko_mini_project.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AppApplicationServices(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 

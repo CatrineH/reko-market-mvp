@@ -8,6 +8,7 @@ public static class WebApplicationExtensions
 {
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
+        app.UseExceptionHandler();
         app.UseHttpsRedirection();
         var corsPolicyName = ServiceCollectionExtensions.FRONTEND_CORS_POLICY;
         app.UseCors(corsPolicyName);
