@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.ImageProcessing.Upload;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 namespace reko_mini_project.Tests;
