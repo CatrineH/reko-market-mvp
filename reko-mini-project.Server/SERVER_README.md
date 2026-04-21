@@ -1,101 +1,143 @@
 # Backend Instructions
-The backend server is built using ASP.NET Core with Minimal APIs and Entity Framework Core. It provides endpoints for product management and a simple SQLite database for development testing. Below are instructions on how to set up and run the server.
+The backend server is built using ASP.NET Core Minimal APIs and Entity Framework Core. It supports product management, image upload to blob storage, and an AI-powered image analysis endpoint.
 
 ## Running the Server
 1. Navigate to the `\reko-mini-project.Server\` directory in your terminal.
-2. Run this command to start the server:
+2. Run:
 ```
    dotnet run
 ```
-3. The server will start listening on the configured port (default is 7213). You should see output in the terminal indicating that the server is running:
+3. The server starts on the configured URL. The default development URL is:
 ```
-   'Now listening on: https://localhost:7213'
+   https://localhost:7213
 ```
 
 ## Running Tests
-To run the unit tests for the server, open Testing tools in VSCode (View -> Testing Tools) or use the following command in the terminal:
+The backend has a dedicated test project at `reko-mini-project.Tests\reko-mini-project.Tests.csproj`. It includes xUnit tests for product logic, image validation, image upload behavior, and multipart endpoint handling.
+
+From the solution root:
 ```
-   dotnet test
+   dotnet test reko-market-mvp.slnx
 ```
 
-## API Endpoints
-The server exposes the following API endpoints for product management:
+From the server folder:
+```
+   dotnet test ..\reko-mini-project.Tests\reko-mini-project.Tests.csproj
+```
+
+In VS Code:
+- Open the Testing view
+- Find `reko-mini-project.Tests`
+- Run individual test files or the full test project
+
+The test project uses:
+- `xunit`
+- `Microsoft.EntityFrameworkCore.InMemory` for database-backed unit tests
+- `Microsoft.AspNetCore.Mvc.Testing` for API endpoint integration tests
+
+## Configuration
+The server uses `appsettings.json` for shared defaults and `appsettings.Development.json` for local development overrides.
+- `appsettings.Development.json` is intentionally excluded from source control to protect local configuration.
+- Use `appsettings.Development.example.json` as the template for local development settings.
+- Do not commit secrets, connection strings, or personal environment values.
+- For sensitive values, prefer `dotnet user-secrets` or environment variables.
+
+## Active API Endpoints
+The server currently exposes these endpoints:
 1. `POST /api/products`
-   - *Create a new product*.
-2. `POST /api/products/{id}/with-image`
-   - *Upload an image for a specific product by its ID*.
+   - Create a new product with a multipart/form-data request and an uploaded image.
+2. `POST /api/products/analyze`
+   - Analyze an uploaded image using AI and return extracted product suggestions.
 3. `PUT /api/products/{id}`
-   - *Update an existing product by its ID*.
+   - Update an existing product by its GUID identifier using JSON body data.
 4. `PUT /api/products/{id}/with-image`
-   - *Update the image for a specific product by its ID*.
+   - Update a product and replace its image using multipart/form-data.
 5. `GET /api/products`
-   - *Retrieve a list of all products*.
+   - Retrieve all products.
 6. `GET /api/products/{id}`
-   - *Retrieve a specific product by its ID*.
+   - Retrieve a specific product by its GUID identifier.
 7. `DELETE /api/products/{id}`
-   - *Delete a product by its ID*.
-- `POST /api/images/upload`
-   - *Upload an image file to blob storage and return the URL of the uploaded image.*
+   - Delete a product by its GUID identifier.
 
+> Note: The server no longer exposes a separate `/api/images/upload` endpoint. Image uploads are handled through the product create/update endpoints.
 
-### Scalar testing
-To use Scalar, add /Scalar suffix to the server URL in the browser:
+### Scalar Testing
+Scalar is enabled in development. Open:
 ```
    https://localhost:7213/Scalar
 ```
-Select the endpoint you want to test from the list, locate the "Test Request" button, click it, then click the "Send" button. 
-You may need to fill in some required fields in the request body for certain endpoints before sending the request.
+Use the UI to select an endpoint, build requests, and send test data.
 
 ## CORS Configuration
-The server is configured to allow cross-origin requests from the frontend application. Allowed origins are specified in launchSettings.json under the `ALLOWED_ORIGINS` environment variable.
-Frotend application should run on the allowed origin specified in the server configuration to avoid CORS issues.
+The server allows cross-origin requests from the frontend origin defined in `Properties/launchSettings.json` and `appsettings.Development.json`.
+- Default development origin: `http://localhost:5173`
+- Configure `ALLOWED_ORIGINS` in launch settings or environment variables for other hosts.
 
 ## Database Configuration
-The server uses ***Entity Framework Core*** with [***`SQLite`***](https://www.sqlite.org) for data storage. The connection string is defined in [***`appsettings.Development.json`***](appsettings.Development.json) under the `ConnectionStrings` section. The default connection string points to a local SQLite database file located in the ***`\Data\`*** folder.
+The server uses Entity Framework Core with SQLite for development storage.
+- Connection string is defined in `appsettings.Development.json` under `ConnectionStrings:DefaultConnection`.
+- Default SQLite file: `Data/products.db`.
 
-### Resetting existing db file and migrations
-If you need to reset the database, delete the existing ***`products.db`*** file in the ***`\Data\`*** folder and remove all migration files in the ***`\Data\Migrations\`*** folder. Then follow the steps below to create a new database.
+### Reset database
+To reset local data:
+1. Delete `Data/products.db`
+2. Remove files under `Data/Migrations`
 
-### Creating the database
-To set up the database, run the following command in the terminal to create the initial migration:
+### Recreate database
+Run:
 ```
    dotnet ef migrations add InitialCreate --output-dir .\Data\Migrations\
 ```
-Then run the following command to create the database file. The file will be created in the ***`\Data\`*** folder:
+Then:
 ```
    dotnet ef database update
 ```
-Now you should be able to run the server and it will use the SQLite database for data storage. Manipulate the database using Scalar endpoints to add, update, or delete data. The data is purely local at this stage, so it will not persist across different machines or deployments.
 
-## Image upload Blob storage management
-Current behavior:
-- Image uploads are stored in Azure Blob Storage.
-- Auth mode is selected in code by config priority:
-   1. `BlobStorage:ConnectionString` -> `BlobServiceClient(connectionString)`
-   2. otherwise `BlobStorage:ServiceUri` -> `BlobServiceClient(serviceUri, DefaultAzureCredential)`
+## Image Upload and Blob Storage
+Image handling uses Azure Blob Storage via the application configuration.
+- If `BlobStorage:ConnectionString` is present, the app uses `BlobServiceClient(connectionString)`.
+- Otherwise it uses `BlobServiceClient(serviceUri, DefaultAzureCredential)` with `BlobStorage:ServiceUri`.
 - `BlobStorage:ContainerName` is required in all environments.
 
-### Development:
-- Use Azurite with `BlobStorage:ConnectionString` in `appsettings.Development.json`.
-- Container name is defined in [appsettings.json](appsettings.json) and [appsettings.Development.json](appsettings.Development.json).
-- Blob SDK API version is pinned in code for Azurite compatibility.
+### Development
+- Local development configuration should be based on `appsettings.Development.example.json` and kept out of Git.
+- The example file includes the local blob storage container name and a safe Azurite connection string placeholder.
+- `BlobStorage:ContainerName` is required and can remain safely documented in the repo.
+- Use Azurite for local blob storage emulation.
 
-### Production (Azure Web App/container):
-- Recommended auth is Managed Identity (no storage key/connection string in app code).
-- Required Azure resources/wiring:
-   1. Azure Storage Account with Blob service
-   2. Blob container (or allow app to create it)
-   3. System- or user-assigned Managed Identity on the Web App
-   4. RBAC assignment: `Storage Blob Data Contributor` for that identity on the storage account or container scope
-- Required app configuration values:
-   - `BlobStorage__ServiceUri=https://<storage-account>.blob.core.windows.net`
-   - `BlobStorage__ContainerName=<container-name>`
-- Important: do not set `BlobStorage__ConnectionString` in production if you want Managed Identity path.
+### Production
+For Azure-hosted deployments, the recommended setup is:
+1. Azure Storage Account with Blob service
+2. Blob container
+3. Managed Identity on the app service or container
+4. `Storage Blob Data Contributor` RBAC for the identity
 
-### Testing:
-- Use VSCode extension ***`Azurite`*** for local blob storage emulation. Then you can use these commands in VSCode command palette:
-   - F1 then ">Azurite: Start" to start the blob service locally (must be done before uploading image).
-   - F1 then ">Azurite: Stop" to stop it when done.
-   - F1 then ">Azurite: Clean" to clean up.
-- Use Scalar endpoints to test blob upload functionality.
-- Use Azure Storage Explorer (desktop app) to view/manage uploaded blobs.
+Recommended app settings:
+- `BlobStorage__ServiceUri=https://<storage-account>.blob.core.windows.net`
+- `BlobStorage__ContainerName=<container-name>`
+
+> Do not set `BlobStorage__ConnectionString` in production if you intend to use Managed Identity.
+
+### Testing with Azurite, Scalar, and Storage Explorer
+- Use the Azurite VS Code extension for local blob storage emulation.
+  - Start the local blob service before running image upload scenarios.
+  - Stop Azurite when done to free the port.
+  - Clean local storage when you want a fresh blob container state.
+- Local development configuration should be based on `appsettings.Development.example.json` and kept out of Git.
+  - The example file includes the local blob storage container name and a safe Azurite connection string placeholder.
+  - `BlobStorage:ContainerName` is required and can remain safely documented in the repo.
+- The server stores uploaded files to blob storage when handling product create/update requests.
+- Scalar is available in development at:
+```
+   https://localhost:7213/Scalar
+```
+  - Use Scalar to test individual API endpoints and inspect request/response payloads.
+  - For multipart form uploads, select the endpoint, attach the file, then send the request.
+- Use Azure Storage Explorer to inspect blob container contents when using Azurite or Azure Storage.
+  - When testing locally with Azurite, connect using the local emulator endpoint (usually `http://127.0.0.1:10000/devstoreaccount1`).
+  - Confirm that uploaded image blobs are created in the configured blob container.
+
+### Notes
+- Product creation and update operations upload images directly as part of the product request.
+- The image analysis endpoint returns `503`/`500` or `422` when AI analysis is unavailable or fails.
+- In development, sample product data is seeded automatically when the app runs under `Development` environment.
