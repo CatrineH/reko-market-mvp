@@ -7,7 +7,7 @@ using reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 namespace reko_mini_project.Server.Features.ImageProcessing.Services;
 
-public class ImageUploadService
+public class ImageUploadService : IImageUploadService
 {
     private readonly IImageValidator _imageValidator;
     private readonly BlobStorageOptions _blobStorageOptions;
@@ -18,15 +18,31 @@ public class ImageUploadService
         _blobStorageOptions = blobStorageOptions.Value;
     }
 
+    /// <summary>
+    /// Validates and uploads the provided image file to Azure Blob Storage, returning the URL of the uploaded image.
+    /// </summary>
+    /// <param name="request">The request containing the image file to be uploaded.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The URL of the uploaded image.</returns>
     public async Task<string> StoreImageAsync(SaveImageDataRequest request, CancellationToken cancellationToken)
     {
-        var file = GetValidatedFile(request);
+
+        if (request.FormFile is null || request.FormFile.Length == 0)
+            throw new ArgumentException("No image file was provided.");
+
+        _imageValidator.Validate(request.FormFile);
+
         var containerClient = await GetContainerClientAsync(cancellationToken);
-        var blobClient = containerClient.GetBlobClient(BuildBlobFileName(file));
-        await UploadFileAsync(blobClient, file, cancellationToken);
+        var blobClient = containerClient.GetBlobClient(BuildBlobFileName(request.FormFile));
+        await UploadFileAsync(blobClient, request.FormFile, cancellationToken);
         return blobClient.Uri.ToString();
     }
 
+    /// <summary>
+    /// Deletes the image with the specified URL from Azure Blob Storage.
+    /// </summary>
+    /// <param name="blobUrl">The URL of the image to be deleted.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     public async Task DeleteImageAsync(string blobUrl, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(blobUrl))
@@ -40,15 +56,7 @@ public class ImageUploadService
         await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
-    private IFormFile GetValidatedFile(SaveImageDataRequest request)
-    {
-        var file = request.FormFile;
-        if (file is null || file.Length == 0)
-            throw new ArgumentException("No image file was provided.");
 
-        _imageValidator.Validate(file);
-        return file;
-    }
 
     private async Task<BlobContainerClient> GetContainerClientAsync(CancellationToken cancellationToken)
     {
