@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 using reko_mini_project.Server.Data;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.ImageProcessing.Upload;
 using reko_mini_project.Server.Features.Products.ErrorResponses;
 
 namespace reko_mini_project.Server.Features.Products.Update;

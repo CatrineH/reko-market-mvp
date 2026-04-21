@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using reko_mini_project.Server.Data;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.ImageProcessing.Upload;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
 using reko_mini_project.Server.Features.Products;
 

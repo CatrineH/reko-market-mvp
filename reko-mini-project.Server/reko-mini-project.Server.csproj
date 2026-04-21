@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>reko_mini_project.Server</RootNamespace>
+    <UserSecretsId>acee782a-036e-40e6-b9e0-7f9e76b3a8fb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
