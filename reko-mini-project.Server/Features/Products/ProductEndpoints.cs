@@ -18,7 +18,6 @@ public static class ProductEndpoints
         group.MapGetProducts();
         group.MapGetProductById();
         group.MapCreateProduct();
-        group.MapCreateProductWithImage();
         group.MapUpdateProduct();
         group.MapUpdateProductWithImage();
         group.MapDeleteProduct();
