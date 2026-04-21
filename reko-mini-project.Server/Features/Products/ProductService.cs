@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using reko_mini_project.Server.Data;
-using reko_mini_project.Server.Features.Products.Create;
-using reko_mini_project.Server.Features.Products.Update;
 
 namespace reko_mini_project.Server.Features.Products;
 
@@ -78,6 +76,8 @@ public class ProductService : IProductService
         }
 
         product.Name = productWriteData.Name;
+        product.Category = productWriteData.Category;
+        product.Description = productWriteData.Description;
         product.ImageUrl = productWriteData.ImageUrl;
         product.Weight = productWriteData.Weight;
         product.Price = productWriteData.Price;
