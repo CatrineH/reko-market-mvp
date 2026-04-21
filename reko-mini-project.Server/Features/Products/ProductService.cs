@@ -25,15 +25,15 @@ public class ProductService : IProductService
         _dbContext = dbContext;
     }
 
-    public async Task<ProductServiceResult> CreateAsync(CreateProductRequest request, string? imageUrl, CancellationToken cancellationToken)
+    public async Task<ProductServiceResult> CreateAsync(ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(request.Name, request.Weight, request.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
         }
 
-        var normalizedName = request.Name.Trim();
+        var normalizedName = productWriteData.Name.Trim();
         if (await NameExistsAsync(normalizedName, excludeId: null, cancellationToken))
         {
             return new ProductServiceResult.ValidationError(
@@ -42,11 +42,12 @@ public class ProductService : IProductService
 
         var product = new Product
         {
-            Id = Guid.NewGuid(),
             Name = normalizedName,
-            ImageUrl = imageUrl ?? string.Empty,
-            Weight = request.Weight,
-            Price = request.Price
+            Category = productWriteData.Category,
+            Description = productWriteData.Description,
+            ImageUrl = productWriteData.ImageUrl,
+            Weight = productWriteData.Weight,
+            Price = productWriteData.Price
         };
 
         _dbContext.Products.Add(product);
@@ -54,9 +55,9 @@ public class ProductService : IProductService
         return new ProductServiceResult.Success(product);
     }
 
-    public async Task<ProductServiceResult> UpdateAsync(Guid id, UpdateProductRequest request, string? imageUrl, CancellationToken cancellationToken)
+    public async Task<ProductServiceResult> UpdateAsync(Guid id, ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(request.Name, request.Weight, request.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
@@ -68,7 +69,7 @@ public class ProductService : IProductService
             return new ProductServiceResult.NotFound();
         }
 
-        var normalizedName = request.Name.Trim();
+        var normalizedName = productWriteData.Name.Trim();
         var nameExists = await NameExistsAsync(normalizedName, excludeId: id, cancellationToken);
         if (nameExists)
         {
@@ -76,10 +77,10 @@ public class ProductService : IProductService
                 new Dictionary<string, string[]> { { NAME, [DUPLICATE_PRODUCT_ERROR] } });
         }
 
-        product.Name = normalizedName;
-        product.ImageUrl = imageUrl ?? product.ImageUrl;
-        product.Weight = request.Weight;
-        product.Price = request.Price;
+        product.Name = productWriteData.Name;
+        product.ImageUrl = productWriteData.ImageUrl;
+        product.Weight = productWriteData.Weight;
+        product.Price = productWriteData.Price;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ProductServiceResult.Success(product);
@@ -96,7 +97,7 @@ public class ProductService : IProductService
         return await query.AnyAsync(cancellationToken);
     }
 
-    public IDictionary<string, string[]> ValidateFields(string name, double weight, decimal price)
+    public IDictionary<string, string[]> ValidateFields(string? name, double? weight, decimal? price)
     {
         var errors = new Dictionary<string, string[]>();
 
@@ -105,12 +106,12 @@ public class ProductService : IProductService
             errors[NAME] = [NAME_REQUIRED_ERROR];
         }
 
-        if (weight <= 0)
+        if (weight is null or <= 0)
         {
             errors[WEIGHT] = [WEIGHT_ERROR];
         }
 
-        if (price <= 0)
+        if (price is null or <= 0)
         {
             errors[PRICE] = [PRICE_ERROR];
         }
