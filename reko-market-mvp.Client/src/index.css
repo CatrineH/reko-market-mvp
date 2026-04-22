@@ -13,8 +13,6 @@ input {
   min-width: var(--input-field-min-width);
   max-width: var(--input-field-max-width);
   min-height: 34px;
-  /* padding: 10px 5px;        */
-  /* margin-top: 6px;          */
   border: var(--global-border);
   border-radius: var(--global-border-radius);
   box-sizing: border-box;
