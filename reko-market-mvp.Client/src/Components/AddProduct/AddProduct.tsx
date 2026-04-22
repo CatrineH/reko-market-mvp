@@ -1,3 +1,5 @@
+import './AddProduct.css';
+
 function AddProduct() {
 
     return (

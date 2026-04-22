@@ -1,3 +1,42 @@
 :root {
+  --global-border-radius: 8px;
+  --global-border: 1px solid #4c4c4c;
+  --login-button-background: #0D7F08;
+  --login-button-textcolor: white;
+  --login-header-margin: 30px;
+  --input-field-min-width: 90%;
+  --input-field-max-width: 100%;
+  --link-text-decoration: none;
+}
 
-  }
+input {
+  min-width: var(--input-field-min-width);
+  max-width: var(--input-field-max-width);
+  min-height: 34px;
+  border: var(--global-border);
+  border-radius: var(--global-border-radius);
+  box-sizing: border-box;
+}
+
+label {
+  display: block; /* puts label on its own line */
+  margin-bottom: 4px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 5px;
+  min-width: var(--input-field-min-width);
+  max-width: var(--input-field-max-width);
+  border: var(--global-border);
+  border-radius: var(--global-border-radius);
+}
+
+h1 {
+  margin-bottom: var(--login-header-margin);
+}
+
+.register-link, .forgot-password-link {
+  text-decoration: var(--link-text-decoration);
+}
+
