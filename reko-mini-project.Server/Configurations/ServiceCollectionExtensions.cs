@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ImageAnalysisService>();
         services.AddScoped<IProductService, ProductService>();
         services.SetupChatClient(configuration);
+        services.AddRateLimiterConfiguration();
 
         return services;
     }
