@@ -10,7 +10,7 @@ public static class ImageProcessingEndpoints
         var group = app.MapGroup(_baseRoute)
             .WithTags(_groupTag1);
 
-        group.MapImageAnalysis();
+        group.MapImageAnalysis().RequireAuthorization("SupplierPolicy");
 
         return app;
     }

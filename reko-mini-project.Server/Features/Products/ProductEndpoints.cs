@@ -15,12 +15,12 @@ public static class ProductEndpoints
         var group = app.MapGroup(_baseRoute)
             .WithTags(_groupTag1);
 
-        group.MapGetProducts();
-        group.MapGetProductById();
-        group.MapCreateProduct();
-        group.MapUpdateProduct();
-        group.MapUpdateProductWithImage();
-        group.MapDeleteProduct();
+        group.MapGetProducts().RequireAuthorization("SupplierPolicy");
+        group.MapGetProductById().RequireAuthorization("SupplierPolicy");
+        group.MapCreateProduct().RequireAuthorization("SupplierPolicy");
+        group.MapUpdateProduct().RequireAuthorization("AdminPolicy");
+        group.MapUpdateProductWithImage().RequireAuthorization("AdminPolicy");
+        group.MapDeleteProduct().RequireAuthorization("AdminPolicy");
 
         return app;
     }
