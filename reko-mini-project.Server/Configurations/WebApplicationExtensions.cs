@@ -24,6 +24,7 @@ public static class WebApplicationExtensions
         app.UseCors(corsPolicyName);
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseRateLimiter();
 
         if (app.Environment.IsDevelopment())
         {

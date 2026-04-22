@@ -1,3 +1,5 @@
+using reko_mini_project.Server.Configurations;
+
 namespace reko_mini_project.Server.Features.ImageProcessing;
 
 public static class ImageProcessingEndpoints
@@ -8,7 +10,8 @@ public static class ImageProcessingEndpoints
     public static IEndpointRouteBuilder MapImageProcessingEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup(_baseRoute)
-            .WithTags(_groupTag1);
+            .WithTags(_groupTag1)
+            .RequireRateLimiting(RateLimiterExtensions.WritePolicyName);
 
         group.MapImageAnalysis().RequireAuthorization("SupplierPolicy");
 
