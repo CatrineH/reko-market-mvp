@@ -7,5 +7,5 @@ public interface IProductService
 {
     Task<ProductServiceResult> CreateAsync(ProductWriteData productWriteData, CancellationToken cancellationToken);
     Task<ProductServiceResult> UpdateAsync(Guid id, ProductWriteData productWriteData, CancellationToken cancellationToken);
-    IDictionary<string, string[]> ValidateFields(string? name, double? weight, decimal? price);
+    IDictionary<string, string[]> ValidateFields(string? name, string? category, string? description, double? weight, decimal? price);
 }

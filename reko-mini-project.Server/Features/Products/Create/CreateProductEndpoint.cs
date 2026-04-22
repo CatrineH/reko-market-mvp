@@ -38,7 +38,13 @@ public static class CreateProductEndpoint
                 IProductService productService,
                 CancellationToken cancellationToken)
     {
-        var fieldErrors = productService.ValidateFields(request.Name, request.Weight, request.Price);
+        var fieldErrors = productService.ValidateFields(
+            request.Name,
+            request.Category,
+            request.Description,
+            request.Weight,
+            request.Price
+            );
         if (fieldErrors.Count > 0)
         {
             return TypedResults.ValidationProblem(fieldErrors);
@@ -51,12 +57,12 @@ public static class CreateProductEndpoint
                 cancellationToken);
 
             var productWriteData = new ProductWriteData(
-                request.Name ?? string.Empty,
-                request.Category ?? string.Empty,
-                request.Description ?? string.Empty,
+                request.Name,
+                request.Category,
+                request.Description,
                 imageUrl,
-                request.Weight ?? 0,
-                request.Price ?? 0
+                request.Weight,
+                request.Price
             );
 
             var result = await productService.CreateAsync(productWriteData, cancellationToken);

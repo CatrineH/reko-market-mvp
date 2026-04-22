@@ -57,6 +57,19 @@ public static class UpdateProductWithImageEndpoint
             return TypedResults.BadRequest(new ErrorResponse("No image file was provided."));
         }
 
+        var fieldErrors = productService.ValidateFields(
+            request.Name,
+            request.Category,
+            request.Description,
+            request.Weight,
+            request.Price
+            );
+
+        if (fieldErrors.Count > 0)
+        {
+            return TypedResults.ValidationProblem(fieldErrors);
+        }
+
         var oldImageUrl = existing.ImageUrl;
 
         try
@@ -66,12 +79,12 @@ public static class UpdateProductWithImageEndpoint
                 cancellationToken);
 
             var updateCommand = new ProductWriteData(
-                request.Name ?? string.Empty,
-                request.Category ?? string.Empty,
-                request.Description ?? string.Empty,
+                request.Name,
+                request.Category,
+                request.Description,
                 newImageUrl,
-                request.Weight ?? 0,
-                request.Price ?? 0
+                request.Weight,
+                request.Price
                 );
 
             var result = await productService.UpdateAsync(id, updateCommand, cancellationToken);
