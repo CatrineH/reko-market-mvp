@@ -12,11 +12,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddMicrosoftIdentityWebApiAuthentication(configuration);
-        services.AddAuthorization(options =>
-            {
-                options.AddPolicy("SupplierPolicy", policy => policy.RequireRole("Supplier"));
-                options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-            });
+        services.AddAuthorizationConfiguration();
         services.AddOpenApi(options =>
         {
             options.AddDocumentTransformer<CustomOpenApiTransformer>();

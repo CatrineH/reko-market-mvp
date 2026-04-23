@@ -13,7 +13,7 @@ public static class ImageProcessingEndpoints
             .WithTags(_groupTag1)
             .RequireRateLimiting(RateLimiterExtensions.WritePolicyName);
 
-        group.MapImageAnalysis().RequireAuthorization("SupplierPolicy");
+        group.MapImageAnalysis().RequireAuthorization(AuthorizationExtensions.Policies.ANALYZE_IMAGE_WITH_AI);
 
         return app;
     }

@@ -17,12 +17,18 @@ public static class ProductEndpoints
             .WithTags(_groupTag1)
             .RequireRateLimiting(RateLimiterExtensions.WritePolicyName);
 
-        group.MapGetProducts().RequireAuthorization("SupplierPolicy");
-        group.MapGetProductById().RequireAuthorization("SupplierPolicy");
-        group.MapCreateProduct().RequireAuthorization("SupplierPolicy");
-        group.MapUpdateProduct().RequireAuthorization("AdminPolicy");
-        group.MapUpdateProductWithImage().RequireAuthorization("AdminPolicy");
-        group.MapDeleteProduct().RequireAuthorization("AdminPolicy");
+        group.MapGetProducts()
+            .RequireAuthorization(AuthorizationExtensions.Policies.READ_GLOBAL_PRODUCTS);
+        group.MapGetProductById()
+            .RequireAuthorization(AuthorizationExtensions.Policies.READ_GLOBAL_PRODUCTS);
+        group.MapCreateProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapUpdateProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapUpdateProductWithImage()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapDeleteProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
 
         return app;
     }
