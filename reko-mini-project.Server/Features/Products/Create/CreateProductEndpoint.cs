@@ -47,6 +47,16 @@ public static class CreateProductEndpoint
             return TypedResults.ValidationProblem(fieldErrors);
         }
 
+        // Validate image file presence
+        if (request.FormFile is null || request.FormFile.Length == 0)
+        {
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
+        }
+
         var imageUrl = await imageUploadService.StoreImageAsync(
             new SaveImageDataRequest(request.FormFile),
             cancellationToken);

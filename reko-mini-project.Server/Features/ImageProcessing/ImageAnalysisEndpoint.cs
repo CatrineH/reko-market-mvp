@@ -41,7 +41,10 @@ public static class AnalyzeImageEndpoint
         if (request.FormFile is null || request.FormFile.Length == 0)
         {
             return TypedResults.ValidationProblem(
-                new Dictionary<string, string[]> { { "formFile", ["No image file was provided."] } });
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
         }
 
         ImageAnalysisResult analysisResult;

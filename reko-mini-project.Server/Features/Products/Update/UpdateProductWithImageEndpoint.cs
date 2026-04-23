@@ -23,10 +23,6 @@ public static class UpdateProductWithImageEndpoint
             .WithDescription(_routeDescription)
             .WithDisplayName(_routeDisplayName)
             .Accepts<ProductFormRequest>(_acceptedContentType)
-            // Image uploads are typically handled by clients that may not support 
-            // antiforgery tokens, such as mobile apps or third-party integrations.
-            // Disabling antiforgery validation allows these clients to interact 
-            // with the endpoint without requiring additional token management.
             .DisableAntiforgery();
     }
 
@@ -53,7 +49,10 @@ public static class UpdateProductWithImageEndpoint
         if (request.FormFile is null || request.FormFile.Length == 0)
         {
             return TypedResults.ValidationProblem(
-                new Dictionary<string, string[]> { { "formFile", ["No image file was provided."] } });
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
         }
 
         var fieldErrors = productService.ValidateFields(
