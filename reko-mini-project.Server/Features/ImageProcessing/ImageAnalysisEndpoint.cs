@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
-using reko_mini_project.Server.Features.Products.ErrorResponses;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
 using reko_mini_project.Server.Features.ImageProcessing.Exceptions;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
@@ -33,7 +32,6 @@ public static class AnalyzeImageEndpoint
     private static async Task<Results<
         Created<ImageAnalysisResponse>,
         ValidationProblem,
-        BadRequest<ErrorResponse>,
         UnprocessableEntity<ImageAnalysisErrorResponse>>>
         AnalyzeProductImageHandler(
             [FromForm] ImageAnalysisRequest request,
@@ -42,7 +40,8 @@ public static class AnalyzeImageEndpoint
     {
         if (request.FormFile is null || request.FormFile.Length == 0)
         {
-            return TypedResults.BadRequest(new ErrorResponse("No image file was provided."));
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]> { { "formFile", ["No image file was provided."] } });
         }
 
         ImageAnalysisResult analysisResult;
