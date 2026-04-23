@@ -20,7 +20,9 @@ function Login() {
     
       <div className="login-form">
         <form onSubmit={handleSubmit}>
+
           <h1>Logg inn</h1>
+          
           <div className="usernameInput">
             <label>Navn eller e-post</label>
             <input

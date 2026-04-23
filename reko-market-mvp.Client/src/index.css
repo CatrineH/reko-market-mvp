@@ -19,8 +19,18 @@ input {
 }
 
 label {
-  display: block; /* puts label on its own line */
+  display: block; 
   margin-bottom: 4px;
+}
+
+.login-button, .confirm-product-button {
+  background-color: var(--login-button-background);
+  color: var(--login-button-textcolor);
+} 
+
+.login-form, .add-product-form {
+  display: flex;
+  justify-content: center;
 }
 
 button {
@@ -36,7 +46,8 @@ h1 {
   margin-bottom: var(--login-header-margin);
 }
 
-.register-link, .forgot-password-link {
+a, a:visited {
   text-decoration: var(--link-text-decoration);
+  color: rgb(15, 15, 15);
 }
 
