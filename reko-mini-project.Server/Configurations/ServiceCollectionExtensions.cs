@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using reko_mini_project.Server.Data;
 using reko_mini_project.Server.ExceptionHandlers;
@@ -31,7 +32,12 @@ public static class ServiceCollectionExtensions
         }
         services.AddProblemDetails();
         services.AddExceptionHandler<ArgumentExceptionHandler>();
+        services.AddExceptionHandler<InvalidDataExceptionHandler>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = ImageValidator.MaxFileSizeBytes;
+        });
         services.AddCorsConfiguration(configuration);
         services.AddSqliteDatabaseConfiguration(configuration);
         services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
