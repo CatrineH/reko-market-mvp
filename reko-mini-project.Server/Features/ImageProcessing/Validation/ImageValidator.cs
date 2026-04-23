@@ -2,25 +2,23 @@ namespace reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 public class ImageValidator : IImageValidator
 {
-    // TODO: Should be heavily reduced, perhaps 200-300 KB
-    // for better performance and to avoid sending large files to the AI model. 
-    // This will require resizing the image on the client side before upload.
-    private const long MaxFileSizeBytes = 1_572_864; // 1.5 MB
+    // TODO: Should use a more robust image validation library for better security and reliability, 
+    // such as ImageSharp or Magick.NET, which can handle various edge cases and provide more comprehensive validation.
 
-    // TODO: Should only allow WebP format for better compression and performance.
+    // 250 KB is a reasonable size limit for product images 
+    // in an e-commerce context, balancing quality and performance.
+    internal const long MaxFileSizeBytes = 250_000;
+
     private static readonly HashSet<string> AllowedMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
-        "image/png",
         "image/webp"
     };
 
-    // TODO: Should only allow WebP format for better compression and performance.
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
         ".jpeg",
-        ".png",
         ".webp"
     };
 
@@ -61,19 +59,14 @@ public class ImageValidator : IImageValidator
         if (bytesRead < 3)
             throw new ArgumentException("File is too small to be a valid image.");
 
-        if (IsJpeg(header) || IsPng(header) || (bytesRead >= 12 && IsWebP(header)))
+        if (IsJpeg(header) || (bytesRead >= 12 && IsWebP(header)))
             return;
 
-        throw new ArgumentException("File content does not match a recognised image format (JPEG, PNG, or WebP).");
+        throw new ArgumentException($"File content does not match a recognised image format ({string.Join(", ", AllowedMimeTypes)}).");
     }
 
-    // TODO: Should use a more robust image validation library for better security and reliability, 
-    // such as ImageSharp or Magick.NET, which can handle various edge cases and provide more comprehensive validation.
     private static bool IsJpeg(Span<byte> h) =>
         h[0] == 0xFF && h[1] == 0xD8 && h[2] == 0xFF;
-
-    private static bool IsPng(Span<byte> h) =>
-        h.Length >= 4 && h[0] == 0x89 && h[1] == 0x50 && h[2] == 0x4E && h[3] == 0x47;
 
     private static bool IsWebP(Span<byte> h) =>
         h[0] == 0x52 && h[1] == 0x49 && h[2] == 0x46 && h[3] == 0x46 && // "RIFF"
