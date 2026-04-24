@@ -5,11 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>reko_mini_project.Server</RootNamespace>
+    <UserSecretsId>acee782a-036e-40e6-b9e0-7f9e76b3a8fb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.19.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.0" />
     <PackageReference Include="OpenAI" Version="2.9.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.13.13" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />

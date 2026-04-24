@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using reko_mini_project.Server.Data;
-using reko_mini_project.Server.Features.Products.Create;
-using reko_mini_project.Server.Features.Products.Update;
 
 namespace reko_mini_project.Server.Features.Products;
 
@@ -13,27 +11,31 @@ public class ProductService : IProductService
     // service layer. For now, this is a simple way to centralize error messages and avoid 
     // magic strings in the code.
     private const string NAME = "name";
+    private const string CATEGORY = "category";
+    private const string DESCRIPTION = "description";
     private const string WEIGHT = "weight";
     private const string PRICE = "price";
     private const string DUPLICATE_PRODUCT_ERROR = "A product with this name already exists.";
+    private const string NAME_REQUIRED_ERROR = "Name is required.";
+    private const string CATEGORY_REQUIRED_ERROR = "Category is required.";
+    private const string DESCRIPTION_REQUIRED_ERROR = "Description is required.";
     private const string WEIGHT_ERROR = "Weight must be greater than zero.";
     private const string PRICE_ERROR = "Price must be greater than zero.";
-    private const string NAME_REQUIRED_ERROR = "Name is required.";
 
     public ProductService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<ProductServiceResult> CreateAsync(CreateProductRequest request, string? imageUrl, CancellationToken cancellationToken)
+    public async Task<ProductServiceResult> CreateAsync(ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(request.Name, request.Weight, request.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Category, productWriteData.Description, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
         }
 
-        var normalizedName = request.Name.Trim();
+        var normalizedName = productWriteData.Name.Trim();
         if (await NameExistsAsync(normalizedName, excludeId: null, cancellationToken))
         {
             return new ProductServiceResult.ValidationError(
@@ -42,11 +44,12 @@ public class ProductService : IProductService
 
         var product = new Product
         {
-            Id = Guid.NewGuid(),
             Name = normalizedName,
-            ImageUrl = imageUrl ?? string.Empty,
-            Weight = request.Weight,
-            Price = request.Price
+            Category = productWriteData.Category,
+            Description = productWriteData.Description,
+            ImageUrl = productWriteData.ImageUrl,
+            Weight = productWriteData.Weight,
+            Price = productWriteData.Price
         };
 
         _dbContext.Products.Add(product);
@@ -54,9 +57,9 @@ public class ProductService : IProductService
         return new ProductServiceResult.Success(product);
     }
 
-    public async Task<ProductServiceResult> UpdateAsync(Guid id, UpdateProductRequest request, string? imageUrl, CancellationToken cancellationToken)
+    public async Task<ProductServiceResult> UpdateAsync(Guid id, ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(request.Name, request.Weight, request.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Category, productWriteData.Description, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
@@ -68,7 +71,7 @@ public class ProductService : IProductService
             return new ProductServiceResult.NotFound();
         }
 
-        var normalizedName = request.Name.Trim();
+        var normalizedName = productWriteData.Name.Trim();
         var nameExists = await NameExistsAsync(normalizedName, excludeId: id, cancellationToken);
         if (nameExists)
         {
@@ -76,10 +79,12 @@ public class ProductService : IProductService
                 new Dictionary<string, string[]> { { NAME, [DUPLICATE_PRODUCT_ERROR] } });
         }
 
-        product.Name = normalizedName;
-        product.ImageUrl = imageUrl ?? product.ImageUrl;
-        product.Weight = request.Weight;
-        product.Price = request.Price;
+        product.Name = productWriteData.Name;
+        product.Category = productWriteData.Category;
+        product.Description = productWriteData.Description;
+        product.ImageUrl = productWriteData.ImageUrl;
+        product.Weight = productWriteData.Weight;
+        product.Price = productWriteData.Price;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ProductServiceResult.Success(product);
@@ -96,24 +101,24 @@ public class ProductService : IProductService
         return await query.AnyAsync(cancellationToken);
     }
 
-    public IDictionary<string, string[]> ValidateFields(string name, double weight, decimal price)
+    public IDictionary<string, string[]> ValidateFields(string? name, string? category, string? description, double? weight, decimal? price)
     {
         var errors = new Dictionary<string, string[]>();
 
         if (string.IsNullOrWhiteSpace(name))
-        {
             errors[NAME] = [NAME_REQUIRED_ERROR];
-        }
 
-        if (weight <= 0)
-        {
+        if (string.IsNullOrWhiteSpace(category))
+            errors[CATEGORY] = [CATEGORY_REQUIRED_ERROR];
+
+        if (string.IsNullOrWhiteSpace(description))
+            errors[DESCRIPTION] = [DESCRIPTION_REQUIRED_ERROR];
+
+        if (weight is null or <= 0)
             errors[WEIGHT] = [WEIGHT_ERROR];
-        }
 
-        if (price <= 0)
-        {
+        if (price is null or <= 0)
             errors[PRICE] = [PRICE_ERROR];
-        }
 
         return errors;
     }

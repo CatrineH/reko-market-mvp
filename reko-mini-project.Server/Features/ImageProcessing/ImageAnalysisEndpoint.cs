@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
-using reko_mini_project.Server.Features.Products.ErrorResponses;
-using reko_mini_project.Server.Features.Products.Create;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.Products;
 using reko_mini_project.Server.Features.ImageProcessing.Exceptions;
+using reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 namespace reko_mini_project.Server.Features.ImageProcessing;
 
@@ -34,17 +32,19 @@ public static class AnalyzeImageEndpoint
     private static async Task<Results<
         Created<ImageAnalysisResponse>,
         ValidationProblem,
-        BadRequest<ErrorResponse>,
         UnprocessableEntity<ImageAnalysisErrorResponse>>>
         AnalyzeProductImageHandler(
             [FromForm] ImageAnalysisRequest request,
             ImageAnalysisService imageAnalysisService,
-            IProductService productService,
             CancellationToken cancellationToken)
     {
         if (request.FormFile is null || request.FormFile.Length == 0)
         {
-            return TypedResults.BadRequest(new ErrorResponse("No image file was provided."));
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
         }
 
         ImageAnalysisResult analysisResult;
@@ -63,8 +63,10 @@ public static class AnalyzeImageEndpoint
             analysisResult.EstimatedWeight,
             analysisResult.SuggestedPriceNok);
 
-        return productService.ValidateFields(response.Name, response.Weight, response.Price) is { Count: > 0 } fieldErrors
-            ? TypedResults.ValidationProblem(fieldErrors)
+        var analysisErrors = ImageAnalysisResponseValidator.Validate(response);
+
+        return analysisErrors.Count > 0
+            ? TypedResults.ValidationProblem(analysisErrors)
             : TypedResults.Created("/api/products/analyzed", response);
     }
 }

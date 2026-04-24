@@ -1,12 +1,10 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using reko_mini_project.Server.Data;
+using reko_mini_project.Server.ExceptionHandlers;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
 using reko_mini_project.Server.Features.Products;
-using Azure.Identity;
-using OpenAI;
-using OpenAI.Chat;
-using System.ClientModel.Primitives;
 
 namespace reko_mini_project.Server.Configurations;
 
@@ -24,7 +22,22 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddOpenApi();
+        var appInsightsConnectionString = configuration["ApplicationInsights:ConnectionString"];
+        if (!string.IsNullOrEmpty(appInsightsConnectionString))
+        {
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = appInsightsConnectionString;
+            });
+        }
         services.AddProblemDetails();
+        services.AddExceptionHandler<ArgumentExceptionHandler>();
+        services.AddExceptionHandler<InvalidDataExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = ImageValidator.MaxFileSizeBytes;
+        });
         services.AddCorsConfiguration(configuration);
         services.AddSqliteDatabaseConfiguration(configuration);
         services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
@@ -63,44 +76,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString(DATABASE_CONNECTION)));
-        return services;
-    }
-
-    public static IServiceCollection SetupChatClient(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        services.AddSingleton((provider) =>
-        {
-            BearerTokenPolicy tokenPolicy = new(
-                new DefaultAzureCredential(),
-                DEFAULT_CHAT_CLIENT_SCOPE);
-
-            string model = AI_MODEL_NAME;
-            string? endpoint = configuration[AI_MODEL_ENDPOINT_CONFIG_KEY];
-
-            if (endpoint == null)
-            {
-                // Absence of endpoint configuration should be handled gracefully 
-                // as it might be intentional in certain environments,
-                // (e.g., local development without AI resources deployed).
-                Console.WriteLine($"Warning: {AI_MODEL_ENDPOINT_CONFIG_KEY} is not configured. ChatClient will not be initialized.");
-                return null!;
-            }
-
-            // Disable the OPENAI001 warning for this specific instance, 
-            // as we are intentionally using the ChatClient constructor that accepts an authentication policy.
-#pragma warning disable OPENAI001
-            return new ChatClient(
-                model: model,
-                authenticationPolicy: tokenPolicy,
-                options: new OpenAIClientOptions()
-                {
-                    Endpoint = new Uri(endpoint)
-                });
-#pragma warning restore OPENAI001
-        });
-
         return services;
     }
 }

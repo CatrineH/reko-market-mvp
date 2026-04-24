@@ -2,7 +2,6 @@ using Azure.Storage.Blobs;
 using Azure.Identity;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
-using reko_mini_project.Server.Features.ImageProcessing.Upload;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 namespace reko_mini_project.Server.Features.ImageProcessing.Services;
