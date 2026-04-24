@@ -2,8 +2,12 @@ namespace reko_mini_project.Server.Features.ImageProcessing.Validation;
 
 public class ImageValidator : IImageValidator
 {
+    // TODO: Should be heavily reduced, perhaps 200-300 KB
+    // for better performance and to avoid sending large files to the AI model. 
+    // This will require resizing the image on the client side before upload.
     private const long MaxFileSizeBytes = 1_572_864; // 1.5 MB
 
+    // TODO: Should only allow WebP format for better compression and performance.
     private static readonly HashSet<string> AllowedMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
@@ -11,6 +15,7 @@ public class ImageValidator : IImageValidator
         "image/webp"
     };
 
+    // TODO: Should only allow WebP format for better compression and performance.
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
@@ -21,17 +26,30 @@ public class ImageValidator : IImageValidator
 
     public void Validate(IFormFile file)
     {
+
+        ValidateFileSize(file);
+        ValidateFileType(file);
+        ValidateFileExtension(file);
+        ValidateMagicBytes(file);
+    }
+
+    private static void ValidateFileSize(IFormFile file)
+    {
         if (file.Length > MaxFileSizeBytes)
-            throw new ArgumentException("Image exceeds the maximum allowed size of 1.5 MB.");
+            throw new ArgumentException($"Image size {file.Length} bytes exceeds the maximum allowed size of {MaxFileSizeBytes} bytes.");
+    }
 
+    private static void ValidateFileType(IFormFile file)
+    {
         if (!AllowedMimeTypes.Contains(file.ContentType))
-            throw new ArgumentException($"Image type '{file.ContentType}' is not allowed. Allowed types: JPEG, PNG, WebP.");
+            throw new ArgumentException($"Image type '{file.ContentType}' is not allowed. Allowed types: {string.Join(", ", AllowedMimeTypes)}.");
+    }
 
+    private static void ValidateFileExtension(IFormFile file)
+    {
         var extension = Path.GetExtension(file.FileName);
         if (!AllowedExtensions.Contains(extension))
-            throw new ArgumentException($"File extension '{extension}' is not allowed. Allowed extensions: .jpg, .jpeg, .png, .webp.");
-
-        ValidateMagicBytes(file);
+            throw new ArgumentException($"File extension '{extension}' is not allowed. Allowed extensions: {string.Join(", ", AllowedExtensions)}.");
     }
 
     private static void ValidateMagicBytes(IFormFile file)
@@ -49,6 +67,8 @@ public class ImageValidator : IImageValidator
         throw new ArgumentException("File content does not match a recognised image format (JPEG, PNG, or WebP).");
     }
 
+    // TODO: Should use a more robust image validation library for better security and reliability, 
+    // such as ImageSharp or Magick.NET, which can handle various edge cases and provide more comprehensive validation.
     private static bool IsJpeg(Span<byte> h) =>
         h[0] == 0xFF && h[1] == 0xD8 && h[2] == 0xFF;
 
