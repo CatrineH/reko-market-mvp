@@ -35,7 +35,14 @@ public static class UpdateProductEndpoint
             IProductService productService,
             CancellationToken cancellationToken)
     {
-        var fieldErrors = productService.ValidateFields(updateRequest.Name, updateRequest.Weight, updateRequest.Price);
+        var fieldErrors = productService.ValidateFields(
+            updateRequest.Name,
+            updateRequest.Category,
+            updateRequest.Description,
+            updateRequest.Weight,
+            updateRequest.Price
+            );
+
         if (fieldErrors.Count > 0)
         {
             return TypedResults.ValidationProblem(fieldErrors);

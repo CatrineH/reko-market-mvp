@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.Features;
+using reko_mini_project.Server.ExceptionHandlers;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
 using reko_mini_project.Server.Features.ImageProcessing.Validation;
 using reko_mini_project.Server.Features.Products;
@@ -17,7 +19,22 @@ public static class ServiceCollectionExtensions
         {
             options.AddDocumentTransformer<CustomOpenApiTransformer>();
         });
+        var appInsightsConnectionString = configuration["ApplicationInsights:ConnectionString"];
+        if (!string.IsNullOrEmpty(appInsightsConnectionString))
+        {
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = appInsightsConnectionString;
+            });
+        }
         services.AddProblemDetails();
+        services.AddExceptionHandler<ArgumentExceptionHandler>();
+        services.AddExceptionHandler<InvalidDataExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = ImageValidator.MaxFileSizeBytes;
+        });
         services.AddCorsConfiguration(configuration);
         services.AddSqliteDatabaseConfiguration(configuration);
         services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));

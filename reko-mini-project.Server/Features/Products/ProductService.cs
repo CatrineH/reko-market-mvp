@@ -11,12 +11,16 @@ public class ProductService : IProductService
     // service layer. For now, this is a simple way to centralize error messages and avoid 
     // magic strings in the code.
     private const string NAME = "name";
+    private const string CATEGORY = "category";
+    private const string DESCRIPTION = "description";
     private const string WEIGHT = "weight";
     private const string PRICE = "price";
     private const string DUPLICATE_PRODUCT_ERROR = "A product with this name already exists.";
+    private const string NAME_REQUIRED_ERROR = "Name is required.";
+    private const string CATEGORY_REQUIRED_ERROR = "Category is required.";
+    private const string DESCRIPTION_REQUIRED_ERROR = "Description is required.";
     private const string WEIGHT_ERROR = "Weight must be greater than zero.";
     private const string PRICE_ERROR = "Price must be greater than zero.";
-    private const string NAME_REQUIRED_ERROR = "Name is required.";
 
     public ProductService(AppDbContext dbContext)
     {
@@ -25,7 +29,7 @@ public class ProductService : IProductService
 
     public async Task<ProductServiceResult> CreateAsync(ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(productWriteData.Name, productWriteData.Weight, productWriteData.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Category, productWriteData.Description, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
@@ -55,7 +59,7 @@ public class ProductService : IProductService
 
     public async Task<ProductServiceResult> UpdateAsync(Guid id, ProductWriteData productWriteData, CancellationToken cancellationToken)
     {
-        var errors = ValidateFields(productWriteData.Name, productWriteData.Weight, productWriteData.Price);
+        var errors = ValidateFields(productWriteData.Name, productWriteData.Category, productWriteData.Description, productWriteData.Weight, productWriteData.Price);
         if (errors.Count > 0)
         {
             return new ProductServiceResult.ValidationError(errors);
@@ -97,24 +101,24 @@ public class ProductService : IProductService
         return await query.AnyAsync(cancellationToken);
     }
 
-    public IDictionary<string, string[]> ValidateFields(string? name, double? weight, decimal? price)
+    public IDictionary<string, string[]> ValidateFields(string? name, string? category, string? description, double? weight, decimal? price)
     {
         var errors = new Dictionary<string, string[]>();
 
         if (string.IsNullOrWhiteSpace(name))
-        {
             errors[NAME] = [NAME_REQUIRED_ERROR];
-        }
+
+        if (string.IsNullOrWhiteSpace(category))
+            errors[CATEGORY] = [CATEGORY_REQUIRED_ERROR];
+
+        if (string.IsNullOrWhiteSpace(description))
+            errors[DESCRIPTION] = [DESCRIPTION_REQUIRED_ERROR];
 
         if (weight is null or <= 0)
-        {
             errors[WEIGHT] = [WEIGHT_ERROR];
-        }
 
         if (price is null or <= 0)
-        {
             errors[PRICE] = [PRICE_ERROR];
-        }
 
         return errors;
     }

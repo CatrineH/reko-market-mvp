@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.Products.ErrorResponses;
 
 namespace reko_mini_project.Server.Features.Products.Create;
 
@@ -24,55 +23,62 @@ public static class CreateProductEndpoint
             .Accepts<ProductFormRequest>(_format)
             .Produces<Product>(StatusCodes.Status201Created)
             .Produces<ValidationProblem>(StatusCodes.Status400BadRequest)
-            .Produces<BadRequest<ErrorResponse>>(StatusCodes.Status400BadRequest)
             .DisableAntiforgery();
     }
 
     private static async Task<Results<
             Created<Product>,
-            ValidationProblem,
-            BadRequest<ErrorResponse>>>
+            ValidationProblem>>
             CreateProductHandler(
                 [FromForm] ProductFormRequest request,
                 IImageUploadService imageUploadService,
                 IProductService productService,
                 CancellationToken cancellationToken)
     {
-        var fieldErrors = productService.ValidateFields(request.Name, request.Weight, request.Price);
+        var fieldErrors = productService.ValidateFields(
+            request.Name,
+            request.Category,
+            request.Description,
+            request.Weight,
+            request.Price
+            );
         if (fieldErrors.Count > 0)
         {
             return TypedResults.ValidationProblem(fieldErrors);
         }
 
-        try
+        // Validate image file presence
+        if (request.FormFile is null || request.FormFile.Length == 0)
         {
-            var imageUrl = await imageUploadService.StoreImageAsync(
-                new SaveImageDataRequest(request.FormFile),
-                cancellationToken);
-
-            var productWriteData = new ProductWriteData(
-                request.Name ?? string.Empty,
-                request.Category ?? string.Empty,
-                request.Description ?? string.Empty,
-                imageUrl,
-                request.Weight ?? 0,
-                request.Price ?? 0
-            );
-
-            var result = await productService.CreateAsync(productWriteData, cancellationToken);
-
-            return result switch
-            {
-                ProductServiceResult.Success s =>
-                    TypedResults.Created($"{_baseRoute}/{s.Product.Id}", s.Product),
-                ProductServiceResult.ValidationError e =>
-                    TypedResults.ValidationProblem(e.Errors),
-                _ => throw new UnreachableException()
-            };
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
         }
-        catch (ArgumentException ex)
+
+        var imageUrl = await imageUploadService.StoreImageAsync(
+            new SaveImageDataRequest(request.FormFile),
+            cancellationToken);
+
+        var productWriteData = new ProductWriteData(
+            request.Name,
+            request.Category,
+            request.Description,
+            imageUrl,
+            request.Weight,
+            request.Price
+        );
+
+        var result = await productService.CreateAsync(productWriteData, cancellationToken);
+
+        return result switch
         {
-            return TypedResults.BadRequest(new ErrorResponse(ex.Message));
-        }
+            ProductServiceResult.Success s =>
+                TypedResults.Created($"{_baseRoute}/{s.Product.Id}", s.Product),
+            ProductServiceResult.ValidationError e =>
+                TypedResults.ValidationProblem(e.Errors),
+            _ => throw new UnreachableException()
+        };
     }
 }

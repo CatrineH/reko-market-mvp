@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 using reko_mini_project.Server.Data;
 using reko_mini_project.Server.Features.ImageProcessing.Services;
-using reko_mini_project.Server.Features.Products.ErrorResponses;
 
 namespace reko_mini_project.Server.Features.Products.Update;
 
@@ -24,18 +23,13 @@ public static class UpdateProductWithImageEndpoint
             .WithDescription(_routeDescription)
             .WithDisplayName(_routeDisplayName)
             .Accepts<ProductFormRequest>(_acceptedContentType)
-            // Image uploads are typically handled by clients that may not support 
-            // antiforgery tokens, such as mobile apps or third-party integrations.
-            // Disabling antiforgery validation allows these clients to interact 
-            // with the endpoint without requiring additional token management.
             .DisableAntiforgery();
     }
 
     private static async Task<Results<
         Ok<Product>,
         ValidationProblem,
-        NotFound,
-        BadRequest<ErrorResponse>>>
+        NotFound>>
         UpdateProductWithImageHandler(
             Guid id,
             [FromForm] ProductFormRequest request,
@@ -54,61 +48,71 @@ public static class UpdateProductWithImageEndpoint
         // validate image file presence
         if (request.FormFile is null || request.FormFile.Length == 0)
         {
-            return TypedResults.BadRequest(new ErrorResponse("No image file was provided."));
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    { SaveImageDataRequest.FormFileFieldName, [SaveImageDataRequest.FormFileRequiredMessage] }
+                });
+        }
+
+        var fieldErrors = productService.ValidateFields(
+            request.Name,
+            request.Category,
+            request.Description,
+            request.Weight,
+            request.Price
+            );
+
+        if (fieldErrors.Count > 0)
+        {
+            return TypedResults.ValidationProblem(fieldErrors);
         }
 
         var oldImageUrl = existing.ImageUrl;
 
-        try
+        var newImageUrl = await imageUploadService.StoreImageAsync(
+            new SaveImageDataRequest(request.FormFile),
+            cancellationToken);
+
+        var updateCommand = new ProductWriteData(
+            request.Name,
+            request.Category,
+            request.Description,
+            newImageUrl,
+            request.Weight,
+            request.Price
+            );
+
+        var result = await productService.UpdateAsync(id, updateCommand, cancellationToken);
+
+        if (result is not ProductServiceResult.Success success)
         {
-            var newImageUrl = await imageUploadService.StoreImageAsync(
-                new SaveImageDataRequest(request.FormFile),
-                cancellationToken);
-
-            var updateCommand = new ProductWriteData(
-                request.Name ?? string.Empty,
-                request.Category ?? string.Empty,
-                request.Description ?? string.Empty,
-                newImageUrl,
-                request.Weight ?? 0,
-                request.Price ?? 0
-                );
-
-            var result = await productService.UpdateAsync(id, updateCommand, cancellationToken);
-
-            if (result is not ProductServiceResult.Success success)
+            return result switch
             {
-                return result switch
-                {
-                    ProductServiceResult.ValidationError e => TypedResults.ValidationProblem(e.Errors),
-                    ProductServiceResult.NotFound => TypedResults.NotFound(),
-                    _ => throw new UnreachableException()
-                };
-            }
-
-            if (!string.IsNullOrWhiteSpace(oldImageUrl))
-            {
-                try
-                {
-                    await imageUploadService.DeleteImageAsync(oldImageUrl, cancellationToken);
-                }
-                catch
-                {
-                    // Product update has been successful, but blob cleanup failed.
-                    // Log the error and continue without interrupting the user flow.
-                    // In a production application, consider implementing a retry mechanism
-                    // or a background job to handle orphaned blobs that failed to delete.
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine($"Failed to delete old image at URL: {oldImageUrl}");
-                    Console.ResetColor();
-                }
-            }
-
-            return TypedResults.Ok(success.Product);
+                ProductServiceResult.ValidationError e => TypedResults.ValidationProblem(e.Errors),
+                ProductServiceResult.NotFound => TypedResults.NotFound(),
+                _ => throw new UnreachableException()
+            };
         }
-        catch (ArgumentException ex)
+
+        if (!string.IsNullOrWhiteSpace(oldImageUrl))
         {
-            return TypedResults.BadRequest(new ErrorResponse(ex.Message));
+            try
+            {
+                await imageUploadService.DeleteImageAsync(oldImageUrl, cancellationToken);
+            }
+            catch
+            {
+                // Product update has been successful, but blob cleanup failed.
+                // Log the error and continue without interrupting the user flow.
+                // In a production application, consider implementing a retry mechanism
+                // or a background job to handle orphaned blobs that failed to delete.
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine($"Failed to delete old image at URL: {oldImageUrl}");
+                Console.ResetColor();
+            }
         }
+
+        return TypedResults.Ok(success.Product);
     }
 }
