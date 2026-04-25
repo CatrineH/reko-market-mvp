@@ -1,18 +1,20 @@
-import './UserProfile.css';
+import { useAccount, useMsal } from "@azure/msal-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import useFetchAllProductsFromDatabase from "../../Hooks/useFetchAllProductsFromDb";
+import './UserProfile.css';
 
 function UserProfile() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { instance, accounts } = useMsal();
+  const account = useAccount(accounts[0]);
+  const { products, loading, error, refetch } = useFetchAllProductsFromDatabase();
 
-  const username = location.state?.username || "Guest";
+  const username = account?.name ?? location.state?.username ?? "Guest";
 
-  // Temporary product list
-  const products = [
-    { id: 1, name: "Melk", price: "20 NOK" },
-    { id: 2, name: "Egg", price: "35 NOK" },
-    { id: 3, name: "Poteter", price: "15 NOK" },
-  ];
+  const handleLogout = () => {
+    instance.logoutRedirect();
+  };
 
   return (
     <div className="profile-container">
@@ -38,16 +40,19 @@ function UserProfile() {
       {/* Product List */}
       <div className="product-list">
         <h3>Mine produkter</h3>
-
-        <ul>
-          {products.map((product) => (
-            <li key={product.id}>
-              {product.name} - {product.price}
-            </li>
-          ))}
-        </ul>
+        {loading && <p>Laster produkter...</p>}
+        {error && <p>Feil: {error}</p>}
+        {!loading && !error && (
+          <ul>
+            {products.map((product) => (
+              <li key={product.id}>
+                {product.name} - {product.price} NOK
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-
+      <button onClick={handleLogout}>Logg ut</button>
     </div>
   );
 }
