@@ -11,7 +11,7 @@ using reko_mini_project.Server.Data;
 namespace reko_mini_project.Server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260421062342_InitialCreate")]
+    [Migration("20260425200325_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
