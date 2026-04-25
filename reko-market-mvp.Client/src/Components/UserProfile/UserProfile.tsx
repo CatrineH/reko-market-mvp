@@ -1,3 +1,4 @@
+import './UserProfile.css';
 import { useLocation, useNavigate } from "react-router-dom";
 
 function UserProfile() {
