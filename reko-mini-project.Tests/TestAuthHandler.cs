@@ -46,6 +46,6 @@ public sealed class TestAuthHandler(
     private static IEnumerable<Claim> DefaultClaims() =>
     [
         new Claim("oid", DefaultOwnerId),
-        new Claim(ClaimTypes.Role, "Supplier"),
+        new Claim(ClaimTypes.Role, "Admin"),
     ];
 }
