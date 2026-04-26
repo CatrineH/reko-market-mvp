@@ -7,7 +7,7 @@ public class ImageValidator : IImageValidator
 
     // 250 KB is a reasonable size limit for product images 
     // in an e-commerce context, balancing quality and performance.
-    internal const long MaxFileSizeBytes = 250_000;
+    public const long MaxFileSizeBytes = 250_000;
 
     private static readonly HashSet<string> AllowedMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {

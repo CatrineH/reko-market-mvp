@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -85,12 +87,24 @@ public class ProductMultipartEndpointsIntegrationTests : IClassFixture<ProductMu
     [Fact]
     public async Task UpdateProduct_WithUnknownId_Returns404()
     {
-        var productId = Guid.NewGuid();
-        using var content = BuildValidMultipartContent();
+        TestAuthHandler.ClaimsOverride =
+        [
+            new Claim("oid", TestAuthHandler.DefaultOwnerId),
+            new Claim(ClaimTypes.Role, "Admin"),
+        ];
+        try
+        {
+            var productId = Guid.NewGuid();
+            using var content = BuildValidMultipartContent();
 
-        var response = await _client.PutAsync($"/api/products/{productId}/with-image", content);
+            var response = await _client.PutAsync($"/api/products/{productId}/with-image", content);
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        finally
+        {
+            TestAuthHandler.ClaimsOverride = null;
+        }
     }
 
     private static MultipartFormDataContent BuildValidMultipartContent()
@@ -163,6 +177,13 @@ public class ProductMultipartEndpointsIntegrationTests : IClassFixture<ProductMu
 
                 services.RemoveAll(typeof(IImageUploadService));
                 services.AddScoped<IImageUploadService, StubImageUploadService>();
+
+                // Replace real Entra JWT validation with a fake handler that authenticates
+                // every request unconditionally. Use TestAuthHandler.ClaimsOverride to control
+                // identity in individual tests.
+                services.AddAuthentication(TestAuthHandler.SchemeName)
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                            TestAuthHandler.SchemeName, _ => { });
             });
         }
     }

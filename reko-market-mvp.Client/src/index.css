@@ -19,16 +19,24 @@ input {
 }
 
 label {
-  display: block; 
+  display: block;
   margin-bottom: 4px;
 }
 
-.login-button, .confirm-product-button {
+.login-button,
+.confirm-product-button {
   background-color: var(--login-button-background);
   color: var(--login-button-textcolor);
-} 
+}
 
-.login-form, .add-product-form {
+.login-with-ms-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form,
+.add-product-form {
   display: flex;
   justify-content: center;
 }
@@ -46,8 +54,8 @@ h1 {
   margin-bottom: var(--login-header-margin);
 }
 
-a, a:visited {
+a,
+a:visited {
   text-decoration: var(--link-text-decoration);
   color: rgb(15, 15, 15);
 }
-

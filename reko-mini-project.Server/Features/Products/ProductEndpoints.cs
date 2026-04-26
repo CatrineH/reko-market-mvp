@@ -1,3 +1,4 @@
+using reko_mini_project.Server.Configurations;
 using reko_mini_project.Server.Features.Products.Create;
 using reko_mini_project.Server.Features.Products.Read;
 using reko_mini_project.Server.Features.Products.Update;
@@ -13,14 +14,21 @@ public static class ProductEndpoints
     public static IEndpointRouteBuilder MapProductEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup(_baseRoute)
-            .WithTags(_groupTag1);
+            .WithTags(_groupTag1)
+            .RequireRateLimiting(RateLimiterExtensions.WritePolicyName);
 
-        group.MapGetProducts();
-        group.MapGetProductById();
-        group.MapCreateProduct();
-        group.MapUpdateProduct();
-        group.MapUpdateProductWithImage();
-        group.MapDeleteProduct();
+        group.MapGetProducts()
+            .RequireAuthorization(AuthorizationExtensions.Policies.READ_GLOBAL_PRODUCTS);
+        group.MapGetProductById()
+            .RequireAuthorization(AuthorizationExtensions.Policies.READ_GLOBAL_PRODUCTS);
+        group.MapCreateProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapUpdateProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapUpdateProductWithImage()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
+        group.MapDeleteProduct()
+            .RequireAuthorization(AuthorizationExtensions.Policies.WRITE_GLOBAL_PRODUCTS);
 
         return app;
     }
