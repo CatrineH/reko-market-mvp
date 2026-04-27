@@ -7,7 +7,7 @@ public static class WebApplicationExtensions
 {
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
-        app.UseExceptionHandler("/error");
+        app.UseExceptionHandler();
         if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();

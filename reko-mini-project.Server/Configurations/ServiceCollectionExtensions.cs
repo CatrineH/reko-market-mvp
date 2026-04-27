@@ -28,15 +28,15 @@ public static class ServiceCollectionExtensions
             });
         }
         services.AddProblemDetails();
-        services.AddExceptionHandler<ArgumentExceptionHandler>();
-        services.AddExceptionHandler<InvalidDataExceptionHandler>();
-        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddExceptionHandler<ProblemExceptionHandler>();
         services.Configure<FormOptions>(options =>
         {
             options.MultipartBodyLengthLimit = ImageValidator.MaxFileSizeBytes;
         });
         services.AddCorsConfiguration(configuration);
-        services.AddSqliteDatabaseConfiguration(configuration);
+        
+        // services.AddSqliteDatabaseConfiguration(configuration);
+        services.AddAzureSqlDatabaseConfiguration(configuration);
         services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
         services.AddScoped<IImageValidator, ImageValidator>();
         services.AddScoped<IImageUploadService, ImageUploadService>();
