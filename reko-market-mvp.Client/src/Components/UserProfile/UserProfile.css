@@ -1,0 +1,79 @@
+/* Container */
+
+.profile-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+/*Profile header*/
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.farm-info {
+  background-color: #f0eded;
+  padding: 15px;
+  border-radius: 20px;
+}
+
+.product-card,
+.farm-card {
+  background-color: #f9f7f7;
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+}
+
+.profile-img,
+.farm-img {
+  margin: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 20%;
+  border: var(--global-border);
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4c4c4c;
+}
+
+.profile-username {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: auto;
+}
+
+/*This could be changed to a link instead of btn*/
+.farm-more-btn {
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  background-color: rgb(255, 255, 255);
+  width: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.add-btn {
+  background-color: #0d7f08;
+  color: white;
+  margin: auto;
+  padding: 17px;
+  border-radius: 10px;
+}
+
+.secondary-btn {
+  background-color: white;
+  color: black;
+  margin: auto;
+  padding: 17px;
+  border-radius: 10px;
+  margin: 8px;
+}
