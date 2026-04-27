@@ -7,12 +7,12 @@ public static class DatabaseExtensions
 {
     public const string DATABASE_CONNECTION = "DefaultConnection";
 
-    public static IServiceCollection AddSqliteDatabaseConfiguration(
+    public static IServiceCollection AddAzureSqlDatabaseConfiguration(
         this IServiceCollection services,
         IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString(DATABASE_CONNECTION)));
+            options.UseSqlServer(configuration.GetConnectionString(DATABASE_CONNECTION)));
         return services;
     }
 }
