@@ -27,23 +27,18 @@ function Login() {
   const handleLoginWithMicrosoft = () => {
     instance.loginRedirect(apiRequest);
   };
-  // -- MS LOGIN end --
-
-  // -- MOCK LOGIN start --
-  // TODO: Remove this when MS login is fully implemented
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     console.log("Submit triggered");
     console.log(`Velkommen, ${username}`);
 
-    navigate("/profile", { state: { username } });
+    navigate("/guest-profile", { state: { username } });
   };
   // -- MOCK LOGIN end --
 
   return (
     <>
-      {/* TODO: Remove this form when Microsoft login is fully implemented. */}
       <div className="login-form">
         <form onSubmit={handleSubmit}>
 
