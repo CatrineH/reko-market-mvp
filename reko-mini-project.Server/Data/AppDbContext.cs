@@ -13,6 +13,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         {
             entity.HasKey(p => p.Id);
             entity.Property(p => p.Name).IsRequired();
+            entity.Property(p => p.Price).HasPrecision(18, 2);
         });
     }
 }
