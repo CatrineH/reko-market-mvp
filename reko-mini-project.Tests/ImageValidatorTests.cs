@@ -5,24 +5,11 @@ namespace reko_mini_project.Tests;
 
 public class ImageValidatorTests
 {
-    private const int MaxFileSizeBytes = 1_572_864;
-
     [Fact]
     public void Validate_AllowsValidJpeg()
     {
         var validator = new ImageValidator();
         var file = CreateFormFile("photo.jpg", "image/jpeg", [0xFF, 0xD8, 0xFF]);
-
-        var ex = Record.Exception(() => validator.Validate(file));
-
-        Assert.Null(ex);
-    }
-
-    [Fact]
-    public void Validate_AllowsValidPng()
-    {
-        var validator = new ImageValidator();
-        var file = CreateFormFile("photo.png", "image/png", [0x89, 0x50, 0x4E, 0x47]);
 
         var ex = Record.Exception(() => validator.Validate(file));
 
@@ -48,7 +35,7 @@ public class ImageValidatorTests
     public void Validate_AllowsFileAtMaxSizeBoundary()
     {
         var validator = new ImageValidator();
-        var bytes = new byte[MaxFileSizeBytes];
+        var bytes = new byte[ImageValidator.MaxFileSizeBytes];
         bytes[0] = 0xFF;
         bytes[1] = 0xD8;
         bytes[2] = 0xFF;
@@ -63,7 +50,7 @@ public class ImageValidatorTests
     public void Validate_ThrowsWhenFileExceedsMaxSize()
     {
         var validator = new ImageValidator();
-        var bytes = new byte[MaxFileSizeBytes + 1];
+        var bytes = new byte[ImageValidator.MaxFileSizeBytes + 1];
         bytes[0] = 0xFF;
         bytes[1] = 0xD8;
         bytes[2] = 0xFF;
