@@ -8,7 +8,8 @@
 }
 /*Profile header*/
 
-.profile-header {
+.profile-header,
+.farm-card {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -17,31 +18,35 @@
 }
 
 .farm-info {
-  background-color: #f0eded;
+  background-color: #dcdbdb;
   padding: 15px;
   border-radius: 20px;
 }
 
 .product-card,
 .farm-card {
-  background-color: #f9f7f7;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 20px;
   margin-bottom: 30px;
 }
 
-.profile-img,
-.farm-img {
+.profile-img {
   margin: 0;
   width: 120px;
   height: 120px;
-  border-radius: 20%;
-  border: var(--global-border);
-  background-color: #e5e7eb;
+  border-radius: 15%;
+
   display: flex;
   align-items: center;
   justify-content: center;
   color: #4c4c4c;
+}
+.farm-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 15%;
+  margin-bottom: 150px;
 }
 
 .profile-username {
