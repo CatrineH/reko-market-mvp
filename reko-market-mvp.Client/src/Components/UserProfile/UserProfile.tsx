@@ -11,8 +11,7 @@ function UserProfile() {
   const { instance, accounts } = useMsal();
   const account = useAccount(accounts[0]);
 
-  const { products, loading, error, refetch } =
-    useFetchAllProductsFromDatabase();
+  const { products } = useFetchAllProductsFromDatabase();
 
   const username = account?.name ?? location.state?.username ?? "Guest";
 
